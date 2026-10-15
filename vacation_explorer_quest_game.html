@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VACATION WITH FAMILY: THE EXPLORER QUEST</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Fredoka & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              teal: '#0d9488',
+              darkTeal: '#0f766e',
+              gold: '#f59e0b',
+              amber: '#d97706',
+              coral: '#f43f5e',
+              sand: '#fef3c7',
+              palm: '#15803d',
+              night: '#0f172a'
+            }
+          },
+          fontFamily: {
+            display: ['Fredoka', 'sans-serif'],
+            body: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #0d9488 50%, #0284c7 100%);
+      min-height: 100vh;
+      color: #1e293b;
+      user-select: none;
+    }
+
+    h1, h2, h3, .font-heading {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(13, 148, 136, 0.6);
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(13, 148, 136, 0.9);
+    }
+
+    /* Animations & Game Visuals */
+    .glow-gold {
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+    }
+    .glow-teal {
+      box-shadow: 0 0 20px rgba(13, 148, 136, 0.5);
+    }
+
+    .bounce-gentle {
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+      100% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); }
+    }
+
+    .chest-shake {
+      animation: shake 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+
+    .card-choice {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-choice:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    /* Custom Checkbox/Radio Badges */
+    .badge-check {
+      transition: all 0.2s ease;
+    }
+    .badge-check.active {
+      background-color: #f59e0b;
+      color: #ffffff;
+      border-color: #d97706;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- TOP GAME HUD BAR -->
+  <header id="game-hud" class="hidden sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 text-white px-4 py-3 shadow-lg">
+    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      
+      <!-- Student Info -->
+      <div class="flex items-center gap-3">
+        <div id="hud-avatar" class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-2xl border-2 border-white shadow">
+          🤠
+        </div>
+        <div>
+          <div id="hud-name" class="font-heading font-bold text-amber-300 text-lg leading-tight">Explorer</div>
+          <div class="text-xs text-slate-300 flex items-center gap-2">
+            <span>Level <span id="hud-level-num">1</span>/6</span>
+            <span class="text-amber-400">•</span>
+            <span id="hud-level-title">Destination Map</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level Progress Bar -->
+      <div class="flex-1 max-w-xs mx-2">
+        <div class="flex justify-between text-xs font-semibold mb-1 text-slate-300">
+          <span>Quest Progress</span>
+          <span id="hud-progress-percent">0%</span>
+        </div>
+        <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden p-0.5 border border-slate-600">
+          <div id="hud-progress-fill" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-500 w-0"></div>
+        </div>
+      </div>
+
+      <!-- Badges & Score -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-1 bg-slate-800/80 px-3 py-1.5 rounded-full border border-amber-500/40">
+          <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+          <span id="hud-score" class="font-heading font-bold text-amber-300 text-lg">0</span>
+          <span class="text-xs text-slate-400">PTS</span>
+        </div>
+
+        <button id="backpack-btn" onclick="openBackpackModal()" class="relative p-2 bg-teal-700 hover:bg-teal-600 rounded-full text-white transition border border-teal-400/50">
+          <i class="fa-solid fa-briefcase text-lg"></i>
+          <span id="hud-badge-count" class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border border-white">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+
+    <!-- SCREEN 0: INTRO SCREEN -->
+    <section id="screen-intro" class="bg-slate-900/85 backdrop-blur-md border-2 border-amber-500/50 rounded-3xl p-6 sm:p-10 text-white shadow-2xl text-center my-auto">
+      <div class="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+        <i class="fa-solid fa-compass mr-1"></i> Form 2 English Guided Writing Quest
+      </div>
+      
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-teal-200 mb-3 drop-shadow">
+        VACATION WITH FAMILY
+      </h1>
+      <p class="font-heading text-xl text-teal-300 mb-6">THE EXPLORER QUEST</p>
+
+      <div class="max-w-2xl mx-auto bg-slate-800/80 rounded-2xl p-5 border border-slate-700 text-slate-200 text-sm sm:text-base leading-relaxed mb-8 text-left shadow-inner">
+        <p class="font-semibold text-amber-300 mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-scroll text-lg"></i> Explorer's Briefing:
+        </p>
+        <p>Welcome, Explorer! Your mission is to plan an unforgettable family vacation and write your own vacation story. Explore the island, complete challenges, collect clues, and unlock the final writing treasure chamber!</p>
+      </div>
+
+      <!-- Avatar & Name Input -->
+      <div class="max-w-md mx-auto mb-8 bg-teal-950/60 p-5 rounded-2xl border border-teal-500/30">
+        <label class="block text-amber-300 font-heading text-lg mb-2 text-left">1. Choose Your Character:</label>
+        <div class="flex justify-center gap-4 mb-5">
+          <button onclick="selectAvatar('🤠')" class="avatar-opt text-3xl p-3 bg-slate-800 border-2 border-amber-500 rounded-2xl hover:scale-110 transition shadow active-avatar" data-avatar="🤠">🤠</button>
+          <button onclick="selectAvatar('👧')" class="avatar-opt text-3xl p-3 bg-slate-800 border-2 border-slate-600 rounded-2xl hover:scale-110 transition shadow" data-avatar="👧">👧</button>
+          <button onclick="selectAvatar('👦')" class="avatar-opt text-3xl p-3 bg-slate-800 border-2 border-slate-600 rounded-2xl hover:scale-110 transition shadow" data-avatar="👦">👦</button>
+          <button onclick="selectAvatar('🐻')" class="avatar-opt text-3xl p-3 bg-slate-800 border-2 border-slate-600 rounded-2xl hover:scale-110 transition shadow" data-avatar="🐻">🐻</button>
+        </div>
+
+        <label for="player-name" class="block text-amber-300 font-heading text-lg mb-2 text-left">2. Enter Explorer Name:</label>
+        <input type="text" id="player-name" placeholder="e.g., Alex / Nurul" class="w-full bg-slate-900 border-2 border-teal-500/60 text-white rounded-xl px-4 py-3 font-heading text-lg focus:outline-none focus:border-amber-400 placeholder-slate-500">
+      </div>
+
+      <button onclick="startGame()" class="pulse-glow bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-heading font-extrabold text-xl px-10 py-4 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 flex items-center gap-3 mx-auto">
+        <span>START EXPLORING</span>
+        <i class="fa-solid fa-map-location-dot"></i>
+      </button>
+    </section>
+
+    <!-- SCREEN 1: LEVEL 1 - DESTINATION MAP -->
+    <section id="screen-level1" class="hidden bg-slate-900/85 backdrop-blur-md border-2 border-teal-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-700">
+        <div>
+          <span class="text-xs text-teal-400 font-bold uppercase tracking-wider">Level 1 Mission</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300">Choose Your Vacation Destination</h2>
+        </div>
+        <div class="bg-teal-900/80 px-3 py-1 rounded-full text-xs text-teal-300 border border-teal-500/40">
+          <i class="fa-solid fa-compass"></i> Step 1 of 5
+        </div>
+      </div>
+
+      <p class="text-slate-300 mb-6">Select <strong>ONE</strong> destination on the island map for your family trip, then answer the guided travel details below.</p>
+
+      <!-- Map Destinations Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <!-- Destination Card 1 -->
+        <div onclick="selectDestination('Beach', '🏖️')" id="dest-Beach" class="card-choice cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 hover:border-amber-400 text-center group">
+          <div class="text-4xl mb-2 group-hover:scale-110 transition">🏖️</div>
+          <h3 class="font-heading font-bold text-amber-300 text-lg">Sunny Beach</h3>
+          <p class="text-xs text-slate-400 mt-1">Golden sand & sea waves</p>
+        </div>
+        <!-- Destination Card 2 -->
+        <div onclick="selectDestination('Island', '🏝️')" id="dest-Island" class="card-choice cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 hover:border-amber-400 text-center group">
+          <div class="text-4xl mb-2 group-hover:scale-110 transition">🏝️</div>
+          <h3 class="font-heading font-bold text-amber-300 text-lg">Tropical Island</h3>
+          <p class="text-xs text-slate-400 mt-1">Clear waters & coral reefs</p>
+        </div>
+        <!-- Destination Card 3 -->
+        <div onclick="selectDestination('Theme Park', '🎡')" id="dest-Theme Park" class="card-choice cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 hover:border-amber-400 text-center group">
+          <div class="text-4xl mb-2 group-hover:scale-110 transition">🎡</div>
+          <h3 class="font-heading font-bold text-amber-300 text-lg">Theme Park</h3>
+          <p class="text-xs text-slate-400 mt-1">Exciting rides & games</p>
+        </div>
+        <!-- Destination Card 4 -->
+        <div onclick="selectDestination('Village', '🏡')" id="dest-Village" class="card-choice cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 hover:border-amber-400 text-center group">
+          <div class="text-4xl mb-2 group-hover:scale-110 transition">🏡</div>
+          <h3 class="font-heading font-bold text-amber-300 text-lg">Peaceful Kampung</h3>
+          <p class="text-xs text-slate-400 mt-1">Fruit orchards & fresh air</p>
+        </div>
+      </div>
+
+      <!-- Guided Details Inputs -->
+      <div id="dest-details-box" class="bg-slate-800/90 rounded-2xl p-5 border border-amber-500/40 space-y-4 mb-8">
+        <h4 class="font-heading text-lg text-amber-300 flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-question"></i> Travel Log Details
+        </h4>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- When -->
+          <div>
+            <label for="l1-when" class="block text-xs font-semibold text-teal-300 mb-1">WHEN did you go?</label>
+            <select id="l1-when" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+              <option value="Last school holiday">Last school holiday</option>
+              <option value="Last month">Last month</option>
+              <option value="During the last weekend">During the last weekend</option>
+              <option value="Last year">Last year</option>
+            </select>
+          </div>
+          <!-- Who -->
+          <div>
+            <label for="l1-who" class="block text-xs font-semibold text-teal-300 mb-1">WHO joined you?</label>
+            <select id="l1-who" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+              <option value="my family">my family</option>
+              <option value="my parents and siblings">my parents and siblings</option>
+              <option value="my whole extended family">my whole extended family</option>
+            </select>
+          </div>
+          <!-- Transport -->
+          <div>
+            <label for="l1-transport" class="block text-xs font-semibold text-teal-300 mb-1">HOW did you travel?</label>
+            <select id="l1-transport" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+              <option value="by car">by car</option>
+              <option value="by express bus">by express bus</option>
+              <option value="by aeroplane">by aeroplane</option>
+              <option value="by ferry">by ferry</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="submitLevel1()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold text-lg px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+          <span>CONTINUE TO GRAMMAR FOREST</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: LEVEL 2 - GRAMMAR FOREST -->
+    <section id="screen-level2" class="hidden bg-slate-900/85 backdrop-blur-md border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-700">
+        <div>
+          <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Level 2 Mission</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300">The Past Tense Grammar Forest</h2>
+        </div>
+        <div class="bg-emerald-900/80 px-3 py-1 rounded-full text-xs text-emerald-300 border border-emerald-500/40">
+          <i class="fa-solid fa-tree"></i> Step 2 of 5
+        </div>
+      </div>
+
+      <p class="text-slate-300 mb-6">Past events require <strong>Simple Past Tense verbs</strong>! Answer all 5 questions correctly to earn your Grammar Explorer Badge.</p>
+
+      <!-- Quiz Box -->
+      <div class="bg-slate-800/90 rounded-2xl p-6 border border-emerald-500/30 mb-6">
+        <div class="flex justify-between items-center mb-4 text-xs text-slate-400">
+          <span>Question <span id="q-num" class="text-amber-300 font-bold text-sm">1</span> of 5</span>
+          <span class="text-emerald-400 font-semibold">+200 Points per correct answer</span>
+        </div>
+
+        <p id="q-text" class="text-lg sm:text-xl font-heading text-white mb-6">
+          Last holiday, my family _____ to Penang.
+        </p>
+
+        <!-- Options Container -->
+        <div id="q-options" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Explanation Feedback Popup -->
+        <div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm font-medium mb-4"></div>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <button id="q-retry-btn" onclick="retryQuestion()" class="hidden bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-sm font-semibold transition">
+          <i class="fa-solid fa-rotate-left mr-1"></i> Try Again
+        </button>
+        <button id="q-next-btn" onclick="nextQuestion()" class="hidden ml-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold px-6 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+          <span>Next Challenge</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: LEVEL 3 - ACTIVITY COVE -->
+    <section id="screen-level3" class="hidden bg-slate-900/85 backdrop-blur-md border-2 border-cyan-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-700">
+        <div>
+          <span class="text-xs text-cyan-400 font-bold uppercase tracking-wider">Level 3 Mission</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300">The Activity Cove</h2>
+        </div>
+        <div class="bg-cyan-900/80 px-3 py-1 rounded-full text-xs text-cyan-300 border border-cyan-500/40">
+          <i class="fa-solid fa-water"></i> Step 3 of 5
+        </div>
+      </div>
+
+      <p class="text-slate-300 mb-4">Click to select exactly <strong>3 favorite holiday activities</strong> to pack into your adventure backpack!</p>
+
+      <div class="text-right text-xs text-cyan-300 font-bold mb-4">
+        Selected: <span id="act-count" class="text-amber-400 text-base">0</span> / 3
+      </div>
+
+      <!-- Activities Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+        <!-- Activity Card 1 -->
+        <div onclick="toggleActivity('swimming in the sea', '🏊‍♂️', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">🏊‍♂️</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Swimming in the sea</h4>
+          <span class="text-xs text-slate-400">Cool waves & fun</span>
+        </div>
+
+        <!-- Activity Card 2 -->
+        <div onclick="toggleActivity('taking beautiful photographs', '📸', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">📸</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Taking photos</h4>
+          <span class="text-xs text-slate-400">Capturing memories</span>
+        </div>
+
+        <!-- Activity Card 3 -->
+        <div onclick="toggleActivity('shopping for souvenirs', '🛍️', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">🛍️</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Shopping for souvenirs</h4>
+          <span class="text-xs text-slate-400">Gifts for friends</span>
+        </div>
+
+        <!-- Activity Card 4 -->
+        <div onclick="toggleActivity('riding thrilling rollercoasters', '🎢', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">🎢</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Riding theme rides</h4>
+          <span class="text-xs text-slate-400">Exciting & fast</span>
+        </div>
+
+        <!-- Activity Card 5 -->
+        <div onclick="toggleActivity('building huge sandcastles', '🏰', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">🏰</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Building sandcastles</h4>
+          <span class="text-xs text-slate-400">Creative beach fun</span>
+        </div>
+
+        <!-- Activity Card 6 -->
+        <div onclick="toggleActivity('visiting local attractions', '📍', this)" class="card-choice act-card cursor-pointer bg-slate-800/90 rounded-2xl p-4 border-2 border-slate-700 text-center">
+          <div class="text-3xl mb-2">📍</div>
+          <h4 class="font-heading font-bold text-amber-300 text-sm sm:text-base">Visiting attractions</h4>
+          <span class="text-xs text-slate-400">Exploring new spots</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="submitLevel3()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold text-lg px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+          <span>PACK ACTIVITIES & CONTINUE</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: LEVEL 4 - FOOD MARKET MATCHING -->
+    <section id="screen-level4" class="hidden bg-slate-900/85 backdrop-blur-md border-2 border-orange-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-700">
+        <div>
+          <span class="text-xs text-orange-400 font-bold uppercase tracking-wider">Level 4 Mission</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300">The Food Night Market</h2>
+        </div>
+        <div class="bg-orange-900/80 px-3 py-1 rounded-full text-xs text-orange-300 border border-orange-500/40">
+          <i class="fa-solid fa-utensils"></i> Step 4 of 5
+        </div>
+      </div>
+
+      <p class="text-slate-300 mb-6">Match each holiday dish with its correct <strong>sensory adjective</strong> to describe your dining experience!</p>
+
+      <!-- Matching Interface -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Foods Column -->
+        <div class="space-y-3">
+          <h3 class="font-heading text-lg text-amber-300 border-b border-slate-700 pb-2">1. Vacation Food</h3>
+          
+          <div id="match-food-0" class="food-item bg-slate-800 p-3.5 rounded-xl border border-slate-600 flex justify-between items-center text-sm font-semibold">
+            <span>🍨 Chocolate Ice Cream</span>
+            <span class="matched-adj text-amber-400 text-xs italic">Select adjective...</span>
+          </div>
+          <div id="match-food-1" class="food-item bg-slate-800 p-3.5 rounded-xl border border-slate-600 flex justify-between items-center text-sm font-semibold">
+            <span>🦐 Fresh Grilled Seafood</span>
+            <span class="matched-adj text-amber-400 text-xs italic">Select adjective...</span>
+          </div>
+          <div id="match-food-2" class="food-item bg-slate-800 p-3.5 rounded-xl border border-slate-600 flex justify-between items-center text-sm font-semibold">
+            <span>🍜 Spicy Curry Noodles</span>
+            <span class="matched-adj text-amber-400 text-xs italic">Select adjective...</span>
+          </div>
+          <div id="match-food-3" class="food-item bg-slate-800 p-3.5 rounded-xl border border-slate-600 flex justify-between items-center text-sm font-semibold">
+            <span>🍉 Tropical Fresh Fruit</span>
+            <span class="matched-adj text-amber-400 text-xs italic">Select adjective...</span>
+          </div>
+        </div>
+
+        <!-- Adjectives Options Column -->
+        <div>
+          <h3 class="font-heading text-lg text-amber-300 border-b border-slate-700 pb-2 mb-3">2. Sensory Adjectives</h3>
+          <p class="text-xs text-slate-400 mb-3">Click a food on the left, then click its matching adjective here:</p>
+          
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="selectMatchAdjective('sweet')" class="adj-btn bg-slate-800 hover:bg-orange-600 border border-slate-600 p-3 rounded-xl font-heading text-center text-sm text-amber-200 transition">
+              🍬 sweet
+            </button>
+            <button onclick="selectMatchAdjective('delicious')" class="adj-btn bg-slate-800 hover:bg-orange-600 border border-slate-600 p-3 rounded-xl font-heading text-center text-sm text-amber-200 transition">
+              😋 delicious
+            </button>
+            <button onclick="selectMatchAdjective('spicy')" class="adj-btn bg-slate-800 hover:bg-orange-600 border border-slate-600 p-3 rounded-xl font-heading text-center text-sm text-amber-200 transition">
+              🌶️ spicy
+            </button>
+            <button onclick="selectMatchAdjective('juicy')" class="adj-btn bg-slate-800 hover:bg-orange-600 border border-slate-600 p-3 rounded-xl font-heading text-center text-sm text-amber-200 transition">
+              💦 juicy
+            </button>
+          </div>
+
+          <div id="food-match-status" class="mt-4 p-3 bg-slate-900 rounded-xl text-xs text-center border border-slate-700 text-slate-300">
+            Click on any dish to begin matching.
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="submitLevel4()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold text-lg px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+          <span>CLAIM FOODIE BADGE</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: LEVEL 5 - MEMORY CAVE -->
+    <section id="screen-level5" class="hidden bg-slate-900/85 backdrop-blur-md border-2 border-purple-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-700">
+        <div>
+          <span class="text-xs text-purple-400 font-bold uppercase tracking-wider">Level 5 Mission</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300">The Memory Cave</h2>
+        </div>
+        <div class="bg-purple-900/80 px-3 py-1 rounded-full text-xs text-purple-300 border border-purple-500/40">
+          <i class="fa-solid fa-gem"></i> Step 5 of 5
+        </div>
+      </div>
+
+      <p class="text-slate-300 mb-6">Discover feeling gems inside the cave and complete your reflection statement to unlock the Golden Treasure Key!</p>
+
+      <!-- Feeling Gems -->
+      <label class="block text-amber-300 font-heading text-base mb-3">1. Select your main feeling during the trip:</label>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+        <button onclick="selectFeeling('excited', '🤩')" class="feel-btn bg-slate-800 hover:bg-purple-600 border border-slate-600 p-3 rounded-2xl text-center transition">
+          <div class="text-2xl mb-1">🤩</div>
+          <div class="font-heading text-sm text-purple-200">excited</div>
+        </button>
+        <button onclick="selectFeeling('relaxed', '😌')" class="feel-btn bg-slate-800 hover:bg-purple-600 border border-slate-600 p-3 rounded-2xl text-center transition">
+          <div class="text-2xl mb-1">😌</div>
+          <div class="font-heading text-sm text-purple-200">relaxed</div>
+        </button>
+        <button onclick="selectFeeling('happy', '😊')" class="feel-btn bg-slate-800 hover:bg-purple-600 border border-slate-600 p-3 rounded-2xl text-center transition">
+          <div class="text-2xl mb-1">😊</div>
+          <div class="font-heading text-sm text-purple-200">happy</div>
+        </button>
+        <button onclick="selectFeeling('wonderful', '✨')" class="feel-btn bg-slate-800 hover:bg-purple-600 border border-slate-600 p-3 rounded-2xl text-center transition">
+          <div class="text-2xl mb-1">✨</div>
+          <div class="font-heading text-sm text-purple-200">wonderful</div>
+        </button>
+        <button onclick="selectFeeling('unforgettable', '🌟')" class="feel-btn bg-slate-800 hover:bg-purple-600 border border-slate-600 p-3 rounded-2xl text-center transition">
+          <div class="text-2xl mb-1">🌟</div>
+          <div class="font-heading text-sm text-purple-200">unforgettable</div>
+        </button>
+      </div>
+
+      <!-- Reflection Prompt Completion -->
+      <div class="bg-slate-800/90 p-5 rounded-2xl border border-purple-500/30 mb-8 space-y-4">
+        <label class="block text-amber-300 font-heading text-base">2. Complete your memory reflection sentence:</label>
+        
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-sm text-slate-200 flex flex-wrap items-center gap-2">
+          <span>I felt</span>
+          <span id="reflection-feeling-display" class="font-bold text-amber-400 underline decoration-dashed">[select feeling]</span>
+          <span>because</span>
+          <input type="text" id="reflection-reason" placeholder="e.g., I got to spend quality time with my family and try new things." class="flex-1 bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-purple-400 min-w-[240px]">
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="submitLevel5()" class="pulse-glow bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-extrabold text-lg px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+          <span>UNLOCK WRITING TREASURE</span>
+          <i class="fa-solid fa-key"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 6: FINAL LEVEL - WRITING TREASURE CHAMBER -->
+    <section id="screen-level6" class="hidden bg-slate-900/90 backdrop-blur-md border-2 border-amber-500/60 rounded-3xl p-5 sm:p-8 text-white shadow-2xl">
+      
+      <!-- Unboxing Banner -->
+      <div class="text-center mb-6 bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-amber-500/20 p-4 rounded-2xl border border-amber-500/40">
+        <div class="text-4xl bounce-gentle inline-block mb-1">👑</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300 font-heading">THE WRITING TREASURE CHAMBER</h2>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">Combine all your collected clues into an outstanding <strong>80–120 word</strong> essay!</p>
+      </div>
+
+      <!-- Live Word Counter HUD Header -->
+      <div class="flex flex-wrap items-center justify-between bg-slate-800 p-3 sm:p-4 rounded-2xl border border-slate-700 mb-6 gap-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-nib text-amber-400 text-lg"></i>
+          <span class="font-heading text-slate-200">Title: <strong>Vacation with Family</strong></span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-slate-400">Total Word Count:</span>
+          <span id="total-word-count" class="font-heading font-bold text-2xl text-amber-400">0</span>
+          <span class="text-xs text-slate-400">/ 80–120 words</span>
+          <span id="word-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-900 text-rose-200 border border-rose-500">Too Short</span>
+        </div>
+
+        <button onclick="toggleWordBank()" class="bg-teal-700 hover:bg-teal-600 text-white text-xs px-3 py-1.5 rounded-xl font-semibold border border-teal-400/40 transition">
+          <i class="fa-solid fa-book-open mr-1"></i> <span id="wordbank-toggle-text">Show Vocabulary Bank</span>
+        </button>
+      </div>
+
+      <!-- Collapsible Vocabulary Bank Drawer -->
+      <div id="wordbank-drawer" class="hidden bg-slate-800/95 p-4 rounded-2xl border border-teal-500/40 mb-6 text-xs space-y-3">
+        <div class="font-heading text-amber-300 text-sm flex items-center justify-between border-b border-slate-700 pb-2">
+          <span><i class="fa-solid fa-lightbulb text-amber-400"></i> Vocabulary & Helper Bank</span>
+          <span class="text-slate-400 font-normal">Click any phrase to insert!</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- Linking Words -->
+          <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+            <span class="font-bold text-teal-300 block mb-1">Linking Words</span>
+            <div class="flex flex-wrap gap-1">
+              <button onclick="insertWord('First, ')" class="bg-slate-800 hover:bg-teal-600 text-slate-200 px-2 py-0.5 rounded">First,</button>
+              <button onclick="insertWord('Then, ')" class="bg-slate-800 hover:bg-teal-600 text-slate-200 px-2 py-0.5 rounded">Then,</button>
+              <button onclick="insertWord('After that, ')" class="bg-slate-800 hover:bg-teal-600 text-slate-200 px-2 py-0.5 rounded">After that,</button>
+              <button onclick="insertWord('Finally, ')" class="bg-slate-800 hover:bg-teal-600 text-slate-200 px-2 py-0.5 rounded">Finally,</button>
+            </div>
+          </div>
+
+          <!-- Past Verbs -->
+          <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+            <span class="font-bold text-amber-300 block mb-1">Past Tense Verbs</span>
+            <div class="flex flex-wrap gap-1">
+              <button onclick="insertWord('went ')" class="bg-slate-800 hover:bg-amber-600 text-slate-200 px-2 py-0.5 rounded">went</button>
+              <button onclick="insertWord('traveled ')" class="bg-slate-800 hover:bg-amber-600 text-slate-200 px-2 py-0.5 rounded">traveled</button>
+              <button onclick="insertWord('ate ')" class="bg-slate-800 hover:bg-amber-600 text-slate-200 px-2 py-0.5 rounded">ate</button>
+              <button onclick="insertWord('enjoyed ')" class="bg-slate-800 hover:bg-amber-600 text-slate-200 px-2 py-0.5 rounded">enjoyed</button>
+            </div>
+          </div>
+
+          <!-- Sensory Adjectives -->
+          <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+            <span class="font-bold text-orange-300 block mb-1">Adjectives</span>
+            <div class="flex flex-wrap gap-1">
+              <button onclick="insertWord('delicious ')" class="bg-slate-800 hover:bg-orange-600 text-slate-200 px-2 py-0.5 rounded">delicious</button>
+              <button onclick="insertWord('sweet ')" class="bg-slate-800 hover:bg-orange-600 text-slate-200 px-2 py-0.5 rounded">sweet</button>
+              <button onclick="insertWord('spicy ')" class="bg-slate-800 hover:bg-orange-600 text-slate-200 px-2 py-0.5 rounded">spicy</button>
+              <button onclick="insertWord('juicy ')" class="bg-slate-800 hover:bg-orange-600 text-slate-200 px-2 py-0.5 rounded">juicy</button>
+            </div>
+          </div>
+
+          <!-- Feelings -->
+          <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+            <span class="font-bold text-purple-300 block mb-1">Feelings</span>
+            <div class="flex flex-wrap gap-1">
+              <button onclick="insertWord('excited ')" class="bg-slate-800 hover:bg-purple-600 text-slate-200 px-2 py-0.5 rounded">excited</button>
+              <button onclick="insertWord('happy ')" class="bg-slate-800 hover:bg-purple-600 text-slate-200 px-2 py-0.5 rounded">happy</button>
+              <button onclick="insertWord('unforgettable ')" class="bg-slate-800 hover:bg-purple-600 text-slate-200 px-2 py-0.5 rounded">unforgettable</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 PARAGRAPH EDITABLE TEXT AREAS -->
+      <div class="space-y-6 mb-8">
+        
+        <!-- Paragraph 1 -->
+        <div class="bg-slate-800/90 p-4 sm:p-5 rounded-2xl border border-slate-700">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-heading text-base font-bold text-amber-300 flex items-center gap-2">
+              <span>Paragraph 1: Introduction</span>
+              <span class="text-xs font-normal text-slate-400">(Where, When, Who, Transport)</span>
+            </h3>
+            <button onclick="useSmartStarter(1)" class="text-xs bg-slate-700 hover:bg-amber-600 text-amber-300 hover:text-white px-2.5 py-1 rounded-lg transition">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto Starter
+            </button>
+          </div>
+
+          <textarea id="para-1" oninput="updateWordCounts()" rows="3" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-amber-400 font-body leading-relaxed" placeholder="Write Paragraph 1 here..."></textarea>
+          <div class="text-right text-xs text-slate-400 mt-1">Words: <span id="p1-count">0</span></div>
+        </div>
+
+        <!-- Paragraph 2 -->
+        <div class="bg-slate-800/90 p-4 sm:p-5 rounded-2xl border border-slate-700">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-heading text-base font-bold text-amber-300 flex items-center gap-2">
+              <span>Paragraph 2: Activities & Food</span>
+              <span class="text-xs font-normal text-slate-400">(Activities, Food experiences)</span>
+            </h3>
+            <button onclick="useSmartStarter(2)" class="text-xs bg-slate-700 hover:bg-amber-600 text-amber-300 hover:text-white px-2.5 py-1 rounded-lg transition">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto Starter
+            </button>
+          </div>
+
+          <textarea id="para-2" oninput="updateWordCounts()" rows="4" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-amber-400 font-body leading-relaxed" placeholder="Write Paragraph 2 here..."></textarea>
+          <div class="text-right text-xs text-slate-400 mt-1">Words: <span id="p2-count">0</span></div>
+        </div>
+
+        <!-- Paragraph 3 -->
+        <div class="bg-slate-800/90 p-4 sm:p-5 rounded-2xl border border-slate-700">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-heading text-base font-bold text-amber-300 flex items-center gap-2">
+              <span>Paragraph 3: Feelings & Conclusion</span>
+              <span class="text-xs font-normal text-slate-400">(How you felt, Final reflection)</span>
+            </h3>
+            <button onclick="useSmartStarter(3)" class="text-xs bg-slate-700 hover:bg-amber-600 text-amber-300 hover:text-white px-2.5 py-1 rounded-lg transition">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto Starter
+            </button>
+          </div>
+
+          <textarea id="para-3" oninput="updateWordCounts()" rows="3" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-amber-400 font-body leading-relaxed" placeholder="Write Paragraph 3 here..."></textarea>
+          <div class="text-right text-xs text-slate-400 mt-1">Words: <span id="p3-count">0</span></div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-between items-center gap-3">
+        <button onclick="autofillAllStarters()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 text-xs sm:text-sm px-4 py-2.5 rounded-xl font-semibold transition">
+          <i class="fa-solid fa-bolt mr-1"></i> Autofill All Starters
+        </button>
+
+        <button onclick="finishQuest()" class="pulse-glow bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-heading font-extrabold text-lg px-8 py-3 rounded-xl shadow-xl transition transform hover:scale-105 flex items-center gap-2">
+          <span>COMPLETE QUEST & VIEW CERTIFICATE</span>
+          <i class="fa-solid fa-award"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 7: COMPLETION SCREEN & PASSPORT CERTIFICATE -->
+    <section id="screen-certificate" class="hidden bg-slate-900/90 backdrop-blur-md border-2 border-amber-400/60 rounded-3xl p-6 sm:p-10 text-white shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="text-5xl mb-2">🎉</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-amber-300 font-heading">CONGRATULATIONS, EXPLORER!</h2>
+        <p class="text-slate-300 text-sm sm:text-base mt-1">You have successfully completed the Explorer Quest and written your vacation essay!</p>
+      </div>
+
+      <!-- Explorer Passport / Certificate Card -->
+      <div id="passport-card" class="bg-gradient-to-br from-amber-500/10 via-slate-900 to-teal-950 p-6 sm:p-8 rounded-3xl border-2 border-amber-400/50 shadow-2xl mb-8 relative overflow-hidden">
+        
+        <!-- Top Passport Header -->
+        <div class="flex justify-between items-start border-b border-amber-500/30 pb-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div id="cert-avatar" class="w-14 h-14 rounded-2xl bg-amber-500 text-3xl flex items-center justify-center border-2 border-white shadow">🤠</div>
+            <div>
+              <h3 id="cert-name" class="font-heading text-2xl font-bold text-amber-300">Explorer Name</h3>
+              <p class="text-xs text-teal-300 font-semibold">Form 2 Master English Explorer</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Final Score</span>
+            <span id="cert-score" class="font-heading text-2xl font-extrabold text-amber-400">1000 PTS</span>
+          </div>
+        </div>
+
+        <!-- Badges Showcase -->
+        <div class="mb-6">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Badges Earned</h4>
+          <div id="cert-badges-list" class="flex flex-wrap gap-2">
+            <!-- Badges rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Completed Essay Box -->
+        <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-700 text-slate-200 text-sm leading-relaxed space-y-3 font-body shadow-inner">
+          <div class="font-heading font-bold text-amber-300 text-center text-lg border-b border-slate-800 pb-2">
+            Vacation with Family
+          </div>
+          <p id="cert-p1" class="whitespace-pre-line"></p>
+          <p id="cert-p2" class="whitespace-pre-line"></p>
+          <p id="cert-p3" class="whitespace-pre-line"></p>
+
+          <div class="pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400 italic">
+            <span>Total Word Count: <strong id="cert-word-count" class="text-amber-300">0</strong> words</span>
+            <span>Target: 80–120 Words</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        <button onclick="copyEssayToClipboard()" class="bg-teal-600 hover:bg-teal-500 text-white font-heading font-bold px-6 py-3 rounded-xl shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-copy"></i> Copy Essay
+        </button>
+        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white font-heading font-bold px-6 py-3 rounded-xl shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Print Passport
+        </button>
+        <button onclick="restartGame()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold px-8 py-3 rounded-xl shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-rotate-right"></i> Play Again
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BACKPACK / BADGES MODAL -->
+  <div id="backpack-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/50 rounded-3xl max-w-md w-full p-6 text-white shadow-2xl">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-700">
+        <h3 class="font-heading text-xl font-bold text-amber-300 flex items-center gap-2">
+          <i class="fa-solid fa-briefcase"></i> Explorer Backpack & Badges
+        </h3>
+        <button onclick="closeBackpackModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Collected Badges</h4>
+          <div id="modal-badges-container" class="flex flex-wrap gap-2">
+            <span class="text-xs text-slate-500 italic">No badges earned yet. Complete levels to earn!</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Current Travel Selections</h4>
+          <div id="modal-selections-container" class="bg-slate-800 p-3 rounded-xl text-xs space-y-1.5 text-slate-300">
+            <div><strong>Destination:</strong> <span id="m-dest">Not selected</span></div>
+            <div><strong>When:</strong> <span id="m-when">Last school holiday</span></div>
+            <div><strong>Who:</strong> <span id="m-who">my family</span></div>
+            <div><strong>Transport:</strong> <span id="m-transport">by car</span></div>
+            <div><strong>Activities:</strong> <span id="m-activities">None selected</span></div>
+            <div><strong>Feeling:</strong> <span id="m-feeling">Not selected</span></div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeBackpackModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold py-2.5 rounded-xl transition">
+        Close Backpack
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ==========================================================================
+       1. GAME STATE MANAGEMENT
+       ========================================================================== */
+    const gameState = {
+      playerName: 'Explorer',
+      avatar: '🤠',
+      score: 0,
+      currentLevel: 1,
+      badges: [],
+      destination: '',
+      destEmoji: '',
+      when: 'Last school holiday',
+      who: 'my family',
+      transport: 'by car',
+      grammarScore: 0,
+      activities: [],
+      foodMatches: {},
+      feeling: '',
+      reflectionReason: '',
+      essayP1: '',
+      essayP2: '',
+      essayP3: ''
+    };
+
+    /* Grammar Quiz Data */
+    const quizQuestions = [
+      {
+        q: "1. Last holiday, my family _____ to Penang.",
+        options: ["go", "went", "going"],
+        correct: 1,
+        exp: "'went' is the past tense of 'go'."
+      },
+      {
+        q: "2. We _____ in the cool blue sea.",
+        options: ["swim", "swam", "swimming"],
+        correct: 1,
+        exp: "'swam' is the past tense of 'swim'."
+      },
+      {
+        q: "3. My father _____ many photographs of the sunset.",
+        options: ["take", "took", "taking"],
+        correct: 1,
+        exp: "'took' is the past tense of 'take'."
+      },
+      {
+        q: "4. We _____ delicious local food at the night market.",
+        options: ["eat", "ate", "eating"],
+        correct: 1,
+        exp: "'ate' is the past tense of 'eat'."
+      },
+      {
+        q: "5. Everyone _____ the memorable trip together.",
+        options: ["enjoy", "enjoyed", "enjoying"],
+        correct: 1,
+        exp: "'enjoyed' is the regular past tense verb ending in -ed."
+      }
+    ];
+
+    let currentQIndex = 0;
+    let selectedFoodIndex = null;
+
+    /* Web Audio API Sound Synthesizer */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.setValueAtTime(180, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'fanfare') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const noteOsc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+            noteOsc.connect(noteGain);
+            noteGain.connect(audioCtx.destination);
+            noteOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
+            noteGain.gain.setValueAtTime(0.2, now + idx * 0.12);
+            noteGain.gain.linearRampToValueAtTime(0.01, now + idx * 0.12 + 0.25);
+            noteOsc.start(now + idx * 0.12);
+            noteOsc.stop(now + idx * 0.12 + 0.25);
+          });
+        }
+      } catch (e) {
+        // Audio fallback
+      }
+    }
+
+    /* ==========================================================================
+       2. NAVIGATION & HUD UPDATES
+       ========================================================================== */
+    function showScreen(screenId) {
+      const screens = ['screen-intro', 'screen-level1', 'screen-level2', 'screen-level3', 'screen-level4', 'screen-level5', 'screen-level6', 'screen-certificate'];
+      screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      const activeScreen = document.getElementById(screenId);
+      if (activeScreen) activeScreen.classList.remove('hidden');
+
+      // Scroll to top smooth
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-name').innerText = gameState.playerName || 'Explorer';
+      document.getElementById('hud-avatar').innerText = gameState.avatar;
+      document.getElementById('hud-score').innerText = gameState.score;
+      document.getElementById('hud-level-num').innerText = Math.min(gameState.currentLevel, 5);
+
+      const levelTitles = ["Destination Map", "Grammar Forest", "Activity Cove", "Food Market", "Memory Cave", "Treasure Chamber"];
+      document.getElementById('hud-level-title').innerText = levelTitles[gameState.currentLevel - 1] || "Treasure Chamber";
+
+      const progressPercent = Math.min(Math.round(((gameState.currentLevel - 1) / 5) * 100), 100);
+      document.getElementById('hud-progress-percent').innerText = `${progressPercent}%`;
+      document.getElementById('hud-progress-fill').style.width = `${progressPercent}%`;
+
+      document.getElementById('hud-badge-count').innerText = gameState.badges.length;
+    }
+
+    function addScore(pts) {
+      gameState.score += pts;
+      updateHUD();
+    }
+
+    function addBadge(badgeName, badgeEmoji) {
+      if (!gameState.badges.some(b => b.name === badgeName)) {
+        gameState.badges.push({ name: badgeName, emoji: badgeEmoji });
+        playSound('fanfare');
+        updateHUD();
+      }
+    }
+
+    /* ==========================================================================
+       3. GAME LEVEL LOGIC
+       ========================================================================== */
+
+    // Avatar Selection
+    function selectAvatar(emoji) {
+      playSound('click');
+      gameState.avatar = emoji;
+      document.querySelectorAll('.avatar-opt').forEach(btn => {
+        if (btn.dataset.avatar === emoji) {
+          btn.classList.add('border-amber-500', 'active-avatar');
+          btn.classList.remove('border-slate-600');
+        } else {
+          btn.classList.remove('border-amber-500', 'active-avatar');
+          btn.classList.add('border-slate-600');
+        }
+      });
+    }
+
+    // Start Game
+    function startGame() {
+      playSound('click');
+      const inputName = document.getElementById('player-name').value.trim();
+      gameState.playerName = inputName.length > 0 ? inputName : 'Explorer';
+
+      document.getElementById('game-hud').classList.remove('hidden');
+      gameState.currentLevel = 1;
+      updateHUD();
+      showScreen('screen-level1');
+    }
+
+    // Level 1: Destination Selection
+    function selectDestination(destName, emoji) {
+      playSound('click');
+      gameState.destination = destName;
+      gameState.destEmoji = emoji;
+
+      document.querySelectorAll('#screen-level1 .card-choice').forEach(card => {
+        card.classList.remove('border-amber-400', 'bg-amber-950/40', 'glow-gold');
+      });
+
+      const selectedCard = document.getElementById(`dest-${destName}`);
+      if (selectedCard) {
+        selectedCard.classList.add('border-amber-400', 'bg-amber-950/40', 'glow-gold');
+      }
+    }
+
+    function submitLevel1() {
+      if (!gameState.destination) {
+        alert('Please choose a destination on the map!');
+        return;
+      }
+      playSound('correct');
+      gameState.when = document.getElementById('l1-when').value;
+      gameState.who = document.getElementById('l1-who').value;
+      gameState.transport = document.getElementById('l1-transport').value;
+
+      addBadge("Map Explorer", "🗺️");
+      addScore(200);
+
+      gameState.currentLevel = 2;
+      updateHUD();
+      loadQuestion(0);
+      showScreen('screen-level2');
+    }
+
+    // Level 2: Grammar Forest Quiz
+    function loadQuestion(index) {
+      currentQIndex = index;
+      const qData = quizQuestions[index];
+
+      document.getElementById('q-num').innerText = index + 1;
+      document.getElementById('q-text').innerText = qData.q;
+
+      const optsContainer = document.getElementById('q-options');
+      optsContainer.innerHTML = '';
+
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.classList.add('hidden');
+
+      document.getElementById('q-next-btn').classList.add('hidden');
+      document.getElementById('q-retry-btn').classList.add('hidden');
+
+      qData.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'q-opt-btn bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl p-3 font-heading text-lg font-semibold text-slate-200 transition text-center';
+        btn.innerText = opt;
+        btn.onclick = () => checkGrammarAnswer(optIdx);
+        optsContainer.appendChild(btn);
+      });
+    }
+
+    function checkGrammarAnswer(selectedIndex) {
+      const qData = quizQuestions[currentQIndex];
+      const feedback = document.getElementById('quiz-feedback');
+      const optBtns = document.querySelectorAll('.q-opt-btn');
+
+      optBtns.forEach(btn => btn.disabled = true);
+
+      feedback.classList.remove('hidden', 'bg-emerald-900/80', 'border-emerald-500', 'bg-rose-900/80', 'border-rose-500');
+
+      if (selectedIndex === qData.correct) {
+        playSound('correct');
+        optBtns[selectedIndex].classList.add('bg-emerald-600', 'border-emerald-400', 'text-white');
+        feedback.classList.add('bg-emerald-900/80', 'border', 'border-emerald-500', 'text-emerald-200');
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> <strong>Awesome!</strong> ${qData.exp}`;
+        
+        addScore(200);
+        document.getElementById('q-next-btn').classList.remove('hidden');
+      } else {
+        playSound('wrong');
+        optBtns[selectedIndex].classList.add('bg-rose-600', 'border-rose-400', 'text-white');
+        feedback.classList.add('bg-rose-900/80', 'border', 'border-rose-500', 'text-rose-200');
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> <strong>Not quite!</strong> ${qData.exp}`;
+        
+        document.getElementById('q-retry-btn').classList.remove('hidden');
+      }
+    }
+
+    function retryQuestion() {
+      playSound('click');
+      loadQuestion(currentQIndex);
+    }
+
+    function nextQuestion() {
+      playSound('click');
+      if (currentQIndex + 1 < quizQuestions.length) {
+        loadQuestion(currentQIndex + 1);
+      } else {
+        // Quiz Complete
+        addBadge("Grammar Master", "📜");
+        gameState.currentLevel = 3;
+        updateHUD();
+        showScreen('screen-level3');
+      }
+    }
+
+    // Level 3: Activity Cove Selection
+    function toggleActivity(actName, emoji, el) {
+      playSound('click');
+      const index = gameState.activities.findIndex(a => a.name === actName);
+
+      if (index > -1) {
+        gameState.activities.splice(index, 1);
+        el.classList.remove('border-amber-400', 'bg-amber-950/40', 'glow-gold');
+      } else {
+        if (gameState.activities.length >= 3) {
+          alert("You can select up to 3 activities!");
+          return;
+        }
+        gameState.activities.push({ name: actName, emoji: emoji });
+        el.classList.add('border-amber-400', 'bg-amber-950/40', 'glow-gold');
+      }
+
+      document.getElementById('act-count').innerText = gameState.activities.length;
+    }
+
+    function submitLevel3() {
+      if (gameState.activities.length !== 3) {
+        alert("Please select exactly 3 activities for your trip!");
+        return;
+      }
+      playSound('correct');
+      addBadge("Action Explorer", "🎒");
+      addScore(200);
+
+      gameState.currentLevel = 4;
+      updateHUD();
+      showScreen('screen-level4');
+    }
+
+    // Level 4: Food Market Matching
+    const foodItems = [
+      { name: "Chocolate Ice Cream", correctAdj: "sweet" },
+      { name: "Fresh Grilled Seafood", correctAdj: "delicious" },
+      { name: "Spicy Curry Noodles", correctAdj: "spicy" },
+      { name: "Tropical Fresh Fruit", correctAdj: "juicy" }
+    ];
+
+    // Select Food row
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.food-item').forEach((item, idx) => {
+        item.addEventListener('click', () => {
+          playSound('click');
+          selectedFoodIndex = idx;
+          document.querySelectorAll('.food-item').forEach(f => f.classList.remove('border-amber-400', 'bg-slate-700'));
+          item.classList.add('border-amber-400', 'bg-slate-700');
+          document.getElementById('food-match-status').innerText = `Matching for: ${foodItems[idx].name}. Click an adjective below!`;
+        });
+      });
+    });
+
+    function selectMatchAdjective(adj) {
+      if (selectedFoodIndex === null) {
+        alert("Click on a vacation food dish on the left first!");
+        return;
+      }
+
+      playSound('click');
+      gameState.foodMatches[selectedFoodIndex] = adj;
+
+      const foodRow = document.getElementById(`match-food-${selectedFoodIndex}`);
+      const matchedSpan = foodRow.querySelector('.matched-adj');
+      matchedSpan.innerText = `Matched: ${adj}`;
+      matchedSpan.className = 'matched-adj font-bold text-amber-400 text-xs';
+
+      document.getElementById('food-match-status').innerText = `Matched ${foodItems[selectedFoodIndex].name} with "${adj}"!`;
+    }
+
+    function submitLevel4() {
+      if (Object.keys(gameState.foodMatches).length < 4) {
+        alert("Please match all 4 dishes with an adjective!");
+        return;
+      }
+
+      // Check correctness
+      let correctCount = 0;
+      foodItems.forEach((item, idx) => {
+        if (gameState.foodMatches[idx] === item.correctAdj) {
+          correctCount++;
+        }
+      });
+
+      playSound('correct');
+      addBadge("Master Foodie", "🍧");
+      addScore(200);
+
+      gameState.currentLevel = 5;
+      updateHUD();
+      showScreen('screen-level5');
+    }
+
+    // Level 5: Memory Cave
+    function selectFeeling(feelingWord, emoji) {
+      playSound('click');
+      gameState.feeling = feelingWord;
+      document.getElementById('reflection-feeling-display').innerText = feelingWord;
+
+      document.querySelectorAll('.feel-btn').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'border-amber-400', 'glow-gold');
+      });
+
+      event.currentTarget.classList.add('bg-purple-600', 'border-amber-400', 'glow-gold');
+    }
+
+    function submitLevel5() {
+      const reasonInput = document.getElementById('reflection-reason').value.trim();
+      if (!gameState.feeling) {
+        alert("Please select a feeling gem!");
+        return;
+      }
+      if (reasonInput.length < 5) {
+        alert("Please complete the reason input field!");
+        return;
+      }
+
+      playSound('fanfare');
+      gameState.reflectionReason = reasonInput;
+      addBadge("Golden Key", "🔑");
+      addScore(200);
+
+      // Trigger Confetti Celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      gameState.currentLevel = 6;
+      updateHUD();
+      initTreasureChamber();
+      showScreen('screen-level6');
+    }
+
+    /* ==========================================================================
+       4. FINAL LEVEL: WRITING TREASURE CHAMBER & SMART STARTERS
+       ========================================================================== */
+    function initTreasureChamber() {
+      // Auto fill starter hints into textareas if empty
+      useSmartStarter(1);
+      useSmartStarter(2);
+      useSmartStarter(3);
+      updateWordCounts();
+    }
+
+    function useSmartStarter(paraNum) {
+      playSound('click');
+      const dest = gameState.destination || 'the beach';
+      const when = gameState.when || 'Last school holiday';
+      const who = gameState.who || 'my family';
+      const transport = gameState.transport || 'by car';
+
+      const actList = gameState.activities.map(a => a.name).join(', ') || 'swimming and taking photographs';
+      const feeling = gameState.feeling || 'excited';
+      const reason = gameState.reflectionReason || 'I got to spend quality time with my family.';
+
+      if (paraNum === 1) {
+        const starter = `${when}, I went to the ${dest} with ${who}. We traveled there ${transport}. The journey was pleasant and exciting.`;
+        document.getElementById('para-1').value = starter;
+      } else if (paraNum === 2) {
+        const starter = `First, we enjoyed ${actList}. After that, we ate delicious seafood and sweet chocolate ice cream at the local market. Everything was mouth-watering.`;
+        document.getElementById('para-2').value = starter;
+      } else if (paraNum === 3) {
+        const starter = `In conclusion, I felt ${feeling} because ${reason} It was truly an unforgettable vacation, and I hope to visit again next year.`;
+        document.getElementById('para-3').value = starter;
+      }
+      updateWordCounts();
+    }
+
+    function autofillAllStarters() {
+      useSmartStarter(1);
+      useSmartStarter(2);
+      useSmartStarter(3);
+    }
+
+    function updateWordCounts() {
+      const p1Text = document.getElementById('para-1').value.trim();
+      const p2Text = document.getElementById('para-2').value.trim();
+      const p3Text = document.getElementById('para-3').value.trim();
+
+      const countWords = (str) => str ? str.split(/\s+/).filter(w => w.length > 0).length : 0;
+
+      const c1 = countWords(p1Text);
+      const c2 = countWords(p2Text);
+      const c3 = countWords(p3Text);
+
+      document.getElementById('p1-count').innerText = c1;
+      document.getElementById('p2-count').innerText = c2;
+      document.getElementById('p3-count').innerText = c3;
+
+      const total = c1 + c2 + c3;
+      document.getElementById('total-word-count').innerText = total;
+
+      const badge = document.getElementById('word-count-badge');
+      if (total < 80) {
+        badge.innerText = 'Too Short';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-900 text-rose-200 border border-rose-500';
+      } else if (total >= 80 && total <= 120) {
+        badge.innerText = 'Perfect Target (80-120)';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-900 text-emerald-200 border border-emerald-500';
+      } else {
+        badge.innerText = 'Great Length';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-900 text-amber-200 border border-amber-500';
+      }
+
+      gameState.essayP1 = p1Text;
+      gameState.essayP2 = p2Text;
+      gameState.essayP3 = p3Text;
+    }
+
+    function toggleWordBank() {
+      playSound('click');
+      const drawer = document.getElementById('wordbank-drawer');
+      const txt = document.getElementById('wordbank-toggle-text');
+      if (drawer.classList.contains('hidden')) {
+        drawer.classList.remove('hidden');
+        txt.innerText = 'Hide Vocabulary Bank';
+      } else {
+        drawer.classList.add('hidden');
+        txt.innerText = 'Show Vocabulary Bank';
+      }
+    }
+
+    function insertWord(word) {
+      playSound('click');
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName === 'TEXTAREA') {
+        const start = activeElement.selectionStart;
+        const end = activeElement.selectionEnd;
+        const text = activeElement.value;
+        activeElement.value = text.substring(0, start) + word + text.substring(end);
+        activeElement.selectionStart = activeElement.selectionEnd = start + word.length;
+        activeElement.focus();
+        updateWordCounts();
+      } else {
+        // Append to Para 2 by default
+        const p2 = document.getElementById('para-2');
+        p2.value += ' ' + word;
+        updateWordCounts();
+      }
+    }
+
+    function finishQuest() {
+      updateWordCounts();
+      playSound('fanfare');
+
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.5 }
+      });
+
+      // Populate Certificate Data
+      document.getElementById('cert-name').innerText = gameState.playerName;
+      document.getElementById('cert-avatar').innerText = gameState.avatar;
+      document.getElementById('cert-score').innerText = `${gameState.score} PTS`;
+
+      document.getElementById('cert-p1').innerText = gameState.essayP1;
+      document.getElementById('cert-p2').innerText = gameState.essayP2;
+      document.getElementById('cert-p3').innerText = gameState.essayP3;
+
+      const totalWords = (document.getElementById('para-1').value + ' ' + document.getElementById('para-2').value + ' ' + document.getElementById('para-3').value).trim().split(/\s+/).filter(w => w.length > 0).length;
+      document.getElementById('cert-word-count').innerText = totalWords;
+
+      // Render Badges
+      const badgesContainer = document.getElementById('cert-badges-list');
+      badgesContainer.innerHTML = '';
+      gameState.badges.forEach(b => {
+        const span = document.createElement('span');
+        span.className = 'inline-flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs px-3 py-1 rounded-full font-heading font-semibold';
+        span.innerHTML = `<span>${b.emoji}</span> <span>${b.name}</span>`;
+        badgesContainer.appendChild(span);
+      });
+
+      showScreen('screen-certificate');
+    }
+
+    /* ==========================================================================
+       5. MODAL & UTILITY FUNCTIONS
+       ========================================================================== */
+    function openBackpackModal() {
+      playSound('click');
+      document.getElementById('backpack-modal').classList.remove('hidden');
+
+      // Update Modal Content
+      document.getElementById('m-dest').innerText = gameState.destination ? `${gameState.destEmoji} ${gameState.destination}` : 'Not selected';
+      document.getElementById('m-when').innerText = gameState.when;
+      document.getElementById('m-who').innerText = gameState.who;
+      document.getElementById('m-transport').innerText = gameState.transport;
+      
+      const actList = gameState.activities.map(a => `${a.emoji} ${a.name}`).join(', ');
+      document.getElementById('m-activities').innerText = actList || 'None selected';
+      document.getElementById('m-feeling').innerText = gameState.feeling || 'Not selected';
+
+      const container = document.getElementById('modal-badges-container');
+      container.innerHTML = '';
+      if (gameState.badges.length === 0) {
+        container.innerHTML = '<span class="text-xs text-slate-500 italic">No badges earned yet.</span>';
+      } else {
+        gameState.badges.forEach(b => {
+          const span = document.createElement('span');
+          span.className = 'inline-flex items-center gap-1 bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs px-2.5 py-1 rounded-full font-heading';
+          span.innerHTML = `${b.emoji} ${b.name}`;
+          container.appendChild(span);
+        });
+      }
+    }
+
+    function closeBackpackModal() {
+      playSound('click');
+      document.getElementById('backpack-modal').classList.add('hidden');
+    }
+
+    function copyEssayToClipboard() {
+      playSound('click');
+      const text = `Title: Vacation with Family\nBy: ${gameState.playerName}\n\n${gameState.essayP1}\n\n${gameState.essayP2}\n\n${gameState.essayP3}`;
+      
+      const tempArea = document.createElement('textarea');
+      tempArea.value = text;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+
+      alert('Essay copied to clipboard!');
+    }
+
+    function restartGame() {
+      playSound('click');
+      gameState.score = 0;
+      gameState.currentLevel = 1;
+      gameState.badges = [];
+      gameState.destination = '';
+      gameState.activities = [];
+      gameState.foodMatches = {};
+      gameState.feeling = '';
+      
+      updateHUD();
+      showScreen('screen-intro');
+    }
+  </script>
+</body>
+</html>
